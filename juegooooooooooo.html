@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Juego Jardín Polinizador</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #f0fdf4, #fef9c3);
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 3rem;
+      color: #166534;
+      margin-bottom: 20px;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .card {
+      background-color: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 20px;
+      width: 160px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.25s ease, background-color 0.25s;
+    }
+
+    .card:hover {
+      transform: scale(1.06);
+      background-color: #f0fdf4;
+    }
+
+    .card span {
+      font-size: 2.2rem;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .jardin {
+      margin-top: 40px;
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 20px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .jardin h2 {
+      color: #15803d;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .planta-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+      font-size: 1.2rem;
+    }
+
+    .score, .success {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+
+    .score {
+      color: #166534;
+    }
+
+    .success {
+      color: #22c55e;
+    }
+
+    .buttons {
+      text-align: center;
+      margin-top: 25px;
+    }
+
+    button {
+      background-color: #22c55e;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border-radius: 10px;
+      margin: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #16a34a;
+    }
+
+    .help {
+      margin-top: 40px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      background-color: #ecfccb;
+      padding: 20px;
+      border-radius: 20px;
+      font-size: 1rem;
+      color: #3f6212;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🐝 Crea tu Jardín Polinizador</h1>
+
+  <div class="container" id="plantas-container"></div>
+
+  <div class="jardin">
+    <h2>🌸 Tu Jardín</h2>
+    <div id="jardin-list"></div>
+    <div class="score" id="score">Puntos: 0</div>
+    <div class="success" id="mensaje-exito" style="display: none;">
+      ✅ ¡Jardín polinizador exitoso!
+    </div>
+
+    <div class="buttons">
+      <button onclick="reiniciarJuego()">🔄 Reiniciar</button>
+      <button onclick="mostrarAyuda()">❓ Ayuda</button>
+    </div>
+  </div>
+
+  <div class="help" id="panel-ayuda" style="display: none;">
+    <strong>¿Qué es un jardín polinizador?</strong><br>
+    Es un espacio lleno de flores y hábitats para insectos que ayudan a polinizar las plantas 🌼🐝<br><br>
+    <strong>Consejos:</strong>
+    <ul>
+      <li>Agrega flores de distintos colores y tamaños</li>
+      <li>Incluye árboles y hoteles de insectos</li>
+      <li>¡Llega a 10 puntos para ganar!</li>
+    </ul>
+  </div>
+
+  <script>
+    const plantas = [
+      { nombre: "Lavanda", tipo: "Flor", emoji: "💜", puntos: 2 },
+      { nombre: "Girásol", tipo: "Flor", emoji: "🌻", puntos: 3 },
+      { nombre: "Árbol Frutal", tipo: "Árbol", emoji: "🌳", puntos: 4 },
+      { nombre: "Margarita", tipo: "Flor", emoji: "🌼", puntos: 1 },
+      { nombre: "Hotel de Insectos", tipo: "Hábitat", emoji: "🐞", puntos: 5 }
+    ];
+
+    const jardin = [];
+    let puntaje = 0;
+
+    const contenedor = document.getElementById("plantas-container");
+    const listaJardin = document.getElementById("jardin-list");
+    const marcador = document.getElementById("score");
+    const mensajeExito = document.getElementById("mensaje-exito");
+    const panelAyuda = document.getElementById("panel-ayuda");
+
+    function actualizarJardin() {
+      listaJardin.innerHTML = "";
+      jardin.forEach(planta => {
+        const div = document.createElement("div");
+        div.className = "planta-item";
+        div.innerHTML = `<span>${planta.emoji}</span> ${planta.nombre}`;
+        listaJardin.appendChild(div);
+      });
+
+      marcador.textContent = `Puntos: ${puntaje}`;
+      mensajeExito.style.display = puntaje >= 10 ? "block" : "none";
+    }
+
+    function agregarPlanta(planta) {
+      jardin.push(planta);
+      puntaje += planta.puntos;
+      actualizarJardin();
+
+      // Efecto de sonido opcional:
+      // new Audio('click.mp3').play();
+    }
+
+    function reiniciarJuego() {
+      jardin.length = 0;
+      puntaje = 0;
+      actualizarJardin();
+    }
+
+    function mostrarAyuda() {
+      panelAyuda.style.display = panelAyuda.style.display === "none" ? "block" : "none";
+    }
+
+    // Crear tarjetas
+    plantas.forEach(planta => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <span>${planta.emoji}</span>
+        <strong>${planta.nombre}</strong><br/>
+        <small>${planta.tipo}</small>
+      `;
+      card.onclick = () => agregarPlanta(planta);
+      contenedor.appendChild(card);
+    });
+  </script>
+
+</body>
+</html>
